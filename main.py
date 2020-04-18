@@ -1,6 +1,7 @@
 import requests
 import bs4 as bs
 import sys
+import csv
 
 
 def main():
@@ -8,8 +9,8 @@ def main():
     soupList = scraper.getPageSoupList()
     parser = WarcrafttavernParser(soupList)
     itemList = parser.getItemList()
-    for item in itemList:
-        print(item)
+    csvwriter = CsvWriter("mc.csv")
+    csvwriter.writeItemList(itemList)
 
 
 class WarcrafttavernScraper:
@@ -111,6 +112,16 @@ class Item:
         self.dropChance = dropChance
         self.sourceUrl = sourceUrl
 
+    def asList(self):
+        return [
+            self.name,
+            self.acquisitionName,
+            self.itemSlot,
+            self.itemType,
+            self.dropChance,
+            self.sourceUrl,
+        ]
+
     def __str__(self):
         message = f"""
 name:               {self.name}
@@ -120,6 +131,29 @@ itemType:           {self.itemType}
 dropChance:         {self.dropChance}
 sourceUrl:          {self.sourceUrl}"""
         return message
+
+    @staticmethod
+    def headerAsList():
+        return [
+            "name",
+            "acquisitionName",
+            "itemSlot",
+            "itemType",
+            "dropChance",
+            "sourceUrl",
+        ]
+
+
+class CsvWriter:
+    def __init__(self, filename):
+        self.filename = filename
+
+    def writeItemList(self, itemList):
+        with open(self.filename, "w", newline="") as csvfile:
+            writer = csv.writer(csvfile, delimiter=",")
+            writer.writerow(Item.headerAsList())
+            for item in itemList:
+                writer.writerow(item.asList())
 
 
 if __name__ == "__main__":
