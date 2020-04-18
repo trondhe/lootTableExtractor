@@ -5,11 +5,18 @@ import csv
 
 
 def main():
-    scraper = WarcrafttavernScraper("mc")
+    lootTable("mc")
+    lootTable("bwl")
+    lootTable("aq40")
+    lootTable("aq20")
+
+
+def lootTable(instance):
+    scraper = WarcrafttavernScraper(instance)
     soupList = scraper.getPageSoupList()
     parser = WarcrafttavernParser(soupList)
     itemList = parser.getItemList()
-    csvwriter = CsvWriter("mc.csv")
+    csvwriter = CsvWriter(instance + ".csv")
     csvwriter.writeItemList(itemList)
 
 
@@ -49,6 +56,12 @@ class WarcrafttavernScraper:
     def __instancePath(self, instance):
         if instance == "mc":
             return "/loot/molten-core/"
+        elif instance == "bwl":
+            return "/loot/bwl/"
+        elif instance == "aq40":
+            return "/loot/aq40/"
+        elif instance == "aq20":
+            return "/loot/aq20/"
         else:
             sys.exit(
                 f"Warcrafttavnern scraper given instance '{instance}' which is not supported"
